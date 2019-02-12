@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>shop-cloud</artifactId>
+        <groupId>com.wp.cloud</groupId>
+        <version>1.0.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.wp.cloud.shop</groupId>
+    <artifactId>shop-zipkin</artifactId>
+
+    <dependencies>
+        <!--<dependency>-->
+            <!--<groupId>org.springframework.cloud</groupId>-->
+            <!--<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>-->
+        <!--</dependency>-->
+        <!--&lt;!&ndash; https://mvnrepository.com/artifact/io.zipkin.java/zipkin-server &ndash;&gt;-->
+        <!--<dependency>-->
+            <!--<groupId>io.zipkin.java</groupId>-->
+            <!--<artifactId>zipkin-server</artifactId>-->
+            <!--<version>2.9.4</version>-->
+        <!--</dependency>&lt;!&ndash; https://mvnrepository.com/artifact/io.zipkin.java/zipkin-autoconfigure-ui &ndash;&gt;-->
+        <!--<dependency>-->
+            <!--<groupId>io.zipkin.java</groupId>-->
+            <!--<artifactId>zipkin-autoconfigure-ui</artifactId>-->
+            <!--<version>2.9.4</version>-->
+        <!--</dependency>-->
+    </dependencies>
+
+    <!-- 添加spring-boot的maven插件，打【可执行】jar包时得用，不能少 -->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+        <finalName>${project.artifactId}</finalName>
+    </build>
+
+</project>

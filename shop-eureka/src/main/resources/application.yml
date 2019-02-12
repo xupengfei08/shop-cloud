@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: shop-eureka
+  security:
+    user:
+      name: wp                # 配置登录的账号是facemeng
+      password: wp123     # 配置登录的密码是facemeng123
+server:
+  port: 9000
+---
+eureka:
+  client:
+    # 是否要注册到其他Eureka Server实例
+    register-with-eureka: false
+    # 是否要从其他Eureka Server实例获取数据
+    fetch-registry: false
+    service-url:
+      defaultZone: http://wp:wp123@localhost:9000/eureka/

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>shop-cloud</artifactId>
+        <groupId>com.wp.cloud</groupId>
+        <version>1.0.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.wp.cloud.shop</groupId>
+    <artifactId>shop-zuul</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-zuul</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-zipkin</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+        </dependency>
+        <!--网关限流-->
+        <!--<dependency>-->
+            <!--<groupId>com.marcosbarbero.cloud</groupId>-->
+            <!--<artifactId>spring-cloud-zuul-ratelimit</artifactId>-->
+            <!--<version>2.0.4.RELEASE</version>-->
+        <!--</dependency>-->
+        <!--重试依赖-->
+        <!--<dependency>-->
+            <!--<groupId>org.springframework.retry</groupId>-->
+            <!--<artifactId>spring-retry</artifactId>-->
+        <!--</dependency>-->
+    </dependencies>
+
+    <!-- 添加spring-boot的maven插件，打【可执行】jar包时得用，不能少 -->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+        <finalName>${project.artifactId}</finalName>
+    </build>
+
+</project>
