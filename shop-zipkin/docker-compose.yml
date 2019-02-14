@@ -1,0 +1,26 @@
+# 公司内部测试环境
+version: '2'
+
+services:
+  # The zipkin process services the UI, and also exposes a POST endpoint that
+  # instrumentation can send trace data to. Scribe is disabled by default.
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin
+    # Environment settings are defined here https://github.com/openzipkin/zipkin/tree/1.19.0/zipkin-server#environment-variables
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=192.168.0.151:9092,192.168.0.152:9092,192.168.0.153:9092
+      - STORAGE_TYPE=elasticsearch
+      # Point the zipkin at the storage backend
+      - ES_HOSTS=192.168.0.151
+      # Uncomment to enable scribe
+      # - SCRIBE_ENABLED=true
+      # Uncomment to enable self-tracing
+      # - SELF_TRACING_ENABLED=true
+      # Uncomment to enable debug logging
+      # - JAVA_OPTS=-Dlogging.level.zipkin=DEBUG -Dlogging.level.zipkin2=DEBUG
+    ports:
+      # Port used for the Zipkin UI and HTTP Api
+      - 9411:9411
+      # Uncomment if you set SCRIBE_ENABLED=true
+      # - 9410:9410

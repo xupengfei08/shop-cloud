@@ -12,5 +12,13 @@
     <groupId>com.wp.cloud.shop.order</groupId>
     <artifactId>order-model</artifactId>
 
+    <dependencies>
+        <!-- swagger2 依赖 -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>${swagger2.version}</version>
+        </dependency>
+    </dependencies>
 
 </project>

@@ -1,0 +1,31 @@
+version: '2'
+
+services:
+  shop-eureka:
+    image: 180.117.163.162:15580/shop-cloud/shop-eureka
+    hostname: shop-eureka
+    container_name: shop-eureka
+    ports:
+      - "9000:9000"
+    command: --spring.profiles.active=dev
+  shop-zuul:
+    image: 180.117.163.162:15580/shop-cloud/shop-zuul
+    hostname: shop-zuul
+    container_name: shop-zuul
+    ports:
+      - "9010:9010"
+    command: --spring.profiles.active=dev
+  shop-user-service:
+    image: 180.117.163.162:15580/shop-cloud/user-core
+    hostname: shop-user-service
+    container_name: shop-user-service
+#    ports:
+#      - "9020:9020"
+    command: --spring.profiles.active=dev
+  shop-order-service:
+    image: 180.117.163.162:15580/shop-cloud/order-core
+    hostname: shop-order-service
+    container_name: shop-order-service
+#    ports:
+#      - "9030:9030"
+    command: --spring.profiles.active=dev

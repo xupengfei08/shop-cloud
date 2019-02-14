@@ -13,7 +13,6 @@
         <module>shop-common</module>
         <module>shop-order</module>
         <module>shop-zuul</module>
-        <module>shop-zipkin</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -28,11 +27,20 @@
     </parent>
 
     <properties>
+        <spring-cloud.version>Finchley.SR2</spring-cloud.version>
+        <spring-platform.version>Cairo-SR7</spring-platform.version>
+
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
-        <spring-cloud.version>Finchley.SR2</spring-cloud.version>
-        <spring-platform.version>Cairo-SR7</spring-platform.version>
+
+        <swagger2.version>2.9.0</swagger2.version>
+        <fastjson.version>1.2.47</fastjson.version>
+
+        <docker.private.url>180.117.163.162:15580</docker.private.url>
+        <docker.project.name>shop-cloud</docker.project.name>
+        <docker.project.version>latest</docker.project.version>
+        <!--<docker.sun.version>1.0.0</docker.sun.version>-->
     </properties>
 
     <dependencies>
@@ -48,7 +56,7 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
-            <version>1.2.47</version>
+            <version>${fastjson.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -75,5 +83,19 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <build>
+        <plugins>
+            <!--mvn install时跳过test-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+        <finalName>${project.artifactId}</finalName>
+    </build>
 
 </project>

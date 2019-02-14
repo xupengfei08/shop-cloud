@@ -5,6 +5,9 @@ import com.wp.cloud.shop.entity.user.User;
 import com.wp.cloud.shop.fegin.user.UserFeign;
 import com.wp.cloud.shop.service.user.UserService;
 import com.wp.cloud.shop.vo.user.UserVo;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +30,14 @@ import java.util.stream.Collectors;
  */
 @RestController
 @Slf4j
+@Api(description = "用户管理")
 public class UserController implements UserFeign {
 
     @Autowired
     private UserService userService;
 
     @Override
+    @ApiOperation(value = "查询所有用户信息",notes = "查询所有用户信息")
     public List<UserDto> getUsers(@ModelAttribute UserVo userVo) {
         Specification specification = (Specification<User>) (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -53,7 +58,8 @@ public class UserController implements UserFeign {
     }
 
     @Override
-    public UserDto getUser(@PathVariable Long id) {
+    @ApiOperation(value = "根据ID查询用户信息",notes = "根据ID查询用户信息")
+    public UserDto getUser(@PathVariable @ApiParam(value = "用户ID",required = true, example = "1") Long id) {
         Optional<User> user = userService.findById(id);
         UserDto userDto = null;
         if (user.isPresent()) {

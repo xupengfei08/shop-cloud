@@ -1,0 +1,69 @@
+spring:
+  zipkin:
+    sender:
+      type: kafka
+    service:
+      name: ${spring.application.name} #zipkin里看到的的service name
+  sleuth:
+    sampler:
+      probability: 1.0 #将采样比例1.0是全部都采集，默认是0.1
+  kafka:
+    bootstrap-servers: 192.168.0.151:9092,192.168.0.152:9092,192.168.0.153:9092 #集群的情况直接用“,”分割
+eureka:
+  client:
+    service-url:
+      # 指定eureka server通信地址，注意/eureka/小尾巴不能少
+      defaultZone: http://wp:wp123@localhost:9000/eureka/
+  instance:
+    # 是否注册IP到eureka server，如不指定或设为false，那就会注册主机名到eureka server
+    prefer-ip-address: true
+---
+feign:
+  client:
+    config:
+      default:
+        loggerLevel: basic
+        connectTimeout: 1000
+        readTimeout: 3000
+      shop-user-service:
+        loggerLevel: basic
+        connectTimeout: 1000
+        readTimeout: 5000
+  httpclient:
+    enabled: false
+  okhttp:
+    enabled: true
+  hystrix:
+    enabled: true
+
+#cloud-user-service:
+#  ribbon:
+#    ConnectTimeout: 3000
+#    ReadTimeout: 6000
+#    OkToRetryOnAllOperations: false
+#    MaxAutoRetriesNextServer: 2
+#    MaxAutoRetries: 0
+
+ribbon:
+#  ConnectTimeout: 3000
+#  ReadTimeout: 4000
+#  OkToRetryOnAllOperations: true
+  MaxAutoRetriesNextServer: 0
+  MaxAutoRetries: 0
+  eager-load:
+    clients: shop-user-service
+    enabled: true
+
+hystrix:
+#  threadpool:
+#    default:
+#      maxQueueSize: 20
+  command:
+    default:  #default全局有效，service id指定应用有效
+      execution:
+        timeout:
+          #是否开启超时熔断
+          enabled: true
+        isolation:
+          thread:
+            timeoutInMilliseconds: 10000 #断路器超时时间，默认1000ms
