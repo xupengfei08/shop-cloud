@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 @Slf4j
 public class RateLimitZuulFilter extends ZuulFilter {
 
-    private final RateLimiter rateLimiter = RateLimiter.create(5.0);
+    private final RateLimiter rateLimiter = RateLimiter.create(50.0);
 
     @Override
     public String filterType() {

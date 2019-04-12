@@ -8,4 +8,4 @@ spring:
       name: wp                # 配置登录的账号是facemeng
       password: wp123     # 配置登录的密码是facemeng123
 server:
-  port: 9000
+  port: 8000

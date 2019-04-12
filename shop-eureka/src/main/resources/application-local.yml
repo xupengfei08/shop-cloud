@@ -5,4 +5,4 @@ eureka:
     # 是否要从其他Eureka Server实例获取数据
     fetch-registry: false
     service-url:
-      defaultZone: http://wp:wp123@localhost:9000/eureka/
+      defaultZone: http://wp:wp123@localhost:8000/eureka/

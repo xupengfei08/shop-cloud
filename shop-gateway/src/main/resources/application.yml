@@ -1,0 +1,69 @@
+server:
+  port: 8011
+spring:
+  profiles:
+    # 默认的profile为local，其他环境通过指定启动参数使用不同的profile，比如：
+    # 生产环境：java -jar xxx.jar --spring.profiles.active=dev
+    active: local
+  redis:
+    host: localhost
+    password: facemeng123
+    port: 6379
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+      - id: shop-order-service
+        uri: lb://shop-order-service
+        predicates:
+        - Path=/shop-order/**
+        filters:
+        - StripPrefix=1
+      - id: shop-user-service
+        uri: lb://shop-user-service
+        predicates:
+        - Path=/shop-user/**
+        filters:
+        - StripPrefix=1
+#        - name: RequestRateLimiter
+#          args:
+#            redis-rate-limiter.replenishRate: 10
+#            redis-rate-limiter.burstCapacity: 20
+#            key-resolver: "#{@userKeyResolver}"
+        - name: Hystrix
+          args:
+            name: fallbackcmd
+            fallbackUri: forward:/fallback
+      - id: shop-websocket-http
+        # 重点！/info必须使用http进行转发，lb代表从注册中心获取服务
+        uri: lb://shop-websocket
+        predicates:
+        # 重点！转发该路径！
+        - Path=/shop-ws/**
+        filters:
+        - StripPrefix=1
+      - id: shop-websocket
+        # 重点！lb:ws://代表从注册中心获取服务，并且转发协议为websocket
+        uri: lb:ws://shop-websocket
+        predicates:
+        # 转发/chat端点下的所有路径
+        - Path=/chat/**
+      ignore:
+        auth-paths:
+          - /**/v2/api-docs
+          - /shop-ws/**
+        wrap-resp-paths:
+          - /**/v2/api-docs
+          - /shop-ws/**
+management:
+  endpoint:
+    gateway:
+      enabled: true
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: "*"

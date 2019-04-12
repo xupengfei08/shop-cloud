@@ -33,6 +33,11 @@ public class OrderController implements OrderFeign {
     @Override
     @ApiOperation(value = "根据ID查询订单信息",notes = "根据ID查询订单信息")
     public Optional<OrderDto> getOrder(@PathVariable @ApiParam(value = "订单ID",required = true, example = "10") Long id) {
+        try {
+            Thread.sleep(id);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         return Optional.of(new OrderDto());
     }
 

@@ -1,0 +1,29 @@
+${AnsiColor.BLUE}
+
+
+
+LLLLLLLLLLL             MMMMMMMM               MMMMMMMMKKKKKKKKK    KKKKKKK          JJJJJJJJJJJ
+L:::::::::L             M:::::::M             M:::::::MK:::::::K    K:::::K          J:::::::::J
+L:::::::::L             M::::::::M           M::::::::MK:::::::K    K:::::K          J:::::::::J
+LL:::::::LL             M:::::::::M         M:::::::::MK:::::::K   K::::::K          JJ:::::::JJ
+  L:::::L               M::::::::::M       M::::::::::MKK::::::K  K:::::KKK            J:::::J
+  L:::::L               M:::::::::::M     M:::::::::::M  K:::::K K:::::K               J:::::J
+  L:::::L               M:::::::M::::M   M::::M:::::::M  K::::::K:::::K                J:::::J
+  L:::::L               M::::::M M::::M M::::M M::::::M  K:::::::::::K                 J:::::j
+  L:::::L               M::::::M  M::::M::::M  M::::::M  K:::::::::::K                 J:::::J
+  L:::::L               M::::::M   M:::::::M   M::::::M  K::::::K:::::K    JJJJJJJ     J:::::J
+  L:::::L               M::::::M    M:::::M    M::::::M  K:::::K K:::::K   J:::::J     J:::::J
+  L:::::L         LLLLLLM::::::M     MMMMM     M::::::MKK::::::K  K:::::KKKJ::::::J   J::::::J
+LL:::::::LLLLLLLLL:::::LM::::::M               M::::::MK:::::::K   K::::::KJ:::::::JJJ:::::::J
+L::::::::::::::::::::::LM::::::M               M::::::MK:::::::K    K:::::K JJ:::::::::::::JJ
+L::::::::::::::::::::::LM::::::M               M::::::MK:::::::K    K:::::K   JJ:::::::::JJ
+LLLLLLLLLLLLLLLLLLLLLLLLMMMMMMMM               MMMMMMMMKKKKKKKKK    KKKKKKK     JJJJJJJJJ
+
+
+
+${AnsiColor.WHITE}
+Application Version: ${application.version}${application.formatted-version}
+Spring Boot Version: ${spring-boot.version}${spring-boot.formatted-version}
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+

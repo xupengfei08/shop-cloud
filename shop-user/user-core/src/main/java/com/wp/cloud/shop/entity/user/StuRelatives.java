@@ -14,10 +14,11 @@ import java.math.BigDecimal;
  * @CreateTime: 2019-01-30 13:16
  */
 @Entity
+@Table(name="szsx_stu_relatives")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class StuRelatives {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

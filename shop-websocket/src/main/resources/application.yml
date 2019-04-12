@@ -1,0 +1,7 @@
+server:
+  port: 8040
+spring:
+  profiles:
+    # 默认的profile为local，其他环境通过指定启动参数使用不同的profile，比如：
+    # 生产环境：java -jar xxx.jar --spring.profiles.active=dev
+    active: local

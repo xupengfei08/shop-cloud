@@ -6,3 +6,6 @@
 *.iws
 *.iml
 *.ipr
+
+### docker启动持久化数据 ###
+shop-data/

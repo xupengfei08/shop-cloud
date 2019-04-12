@@ -1,0 +1,43 @@
+eureka:
+  client:
+    service-url:
+      # 指定eureka server通信地址，注意/eureka/小尾巴不能少
+      defaultZone: http://wp:wp123@localhost:8000/eureka/
+  instance:
+    # 是否注册IP到eureka server，如不指定或设为false，那就会注册主机名到eureka server
+    prefer-ip-address: true
+
+ribbon:
+  ConnectTimeout: 1000
+  ReadTimeout: 3000
+#  OkToRetryOnAllOperations: true
+  MaxAutoRetries: 0       # 重试相同实例
+  MaxAutoRetriesNextServer: 0 # 重试下一实例
+  okhttp:
+    enabled: true
+
+hystrix:
+  command:
+    default:  #default全局有效，service id指定应用有效
+      execution:
+        timeout:
+          #是否开启超时熔断
+          enabled: true
+        isolation:
+          thread:
+            timeoutInMilliseconds: 3000 #断路器超时时间，默认1000ms
+
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: '*'
+#  endpoint:
+#    health:
+#      show-details: always
+
+logging:
+  level:
+    com.wp.cloud.shop: DEBUG
+#    org.springframework.cloud.gateway: DEBUG
+#    com.netflix: DEBUG

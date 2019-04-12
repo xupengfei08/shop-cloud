@@ -1,6 +1,6 @@
 server:
   # 指定Tomcat端口
-  port: 9020
+  port: 8020
 spring:
   profiles:
     # 默认的profile为local，其他环境通过指定启动参数使用不同的profile，比如：

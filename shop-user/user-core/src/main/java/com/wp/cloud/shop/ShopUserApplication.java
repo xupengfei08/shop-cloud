@@ -1,6 +1,5 @@
 package com.wp.cloud.shop;
 
-import com.wp.cloud.shop.entity.user.User;
 import com.wp.cloud.shop.service.user.UserService;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
@@ -8,9 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
-
-import java.math.BigDecimal;
-import java.util.stream.Stream;
 
 @EnableEurekaClient
 @SpringBootApplication
@@ -34,11 +30,7 @@ public class ShopUserApplication {
     @Bean
     ApplicationRunner init(UserService userService) {
         return args -> {
-            User user1 = new User(1L, "account1", "张三", 20, true, new BigDecimal(50.00));
-            User user2 = new User(2L, "account2", "李四", 28, false, new BigDecimal(80.00));
-            User user3 = new User(3L, "account3", "王五", 32, true, new BigDecimal(100.00));
-            Stream.of(user1, user2, user3)
-                    .forEach(userService::save);
+            userService.count();
         };
     }
 

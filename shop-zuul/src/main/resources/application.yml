@@ -1,5 +1,5 @@
 server:
-  port: 9010
+  port: 8010
 spring:
   profiles:
     # 默认的profile为local，其他环境通过指定启动参数使用不同的profile，比如：
@@ -18,5 +18,8 @@ zuul:
     shop-user-service:           # 该配置方式中，user-route只是给路由一个名称，可以任意起名。
       service-id: shop-user-service
       path: /shop-user/**
+    shop-file-service:           # 该配置方式中，user-route只是给路由一个名称，可以任意起名。
+      service-id: shop-file-service
+      path: /shop-file/**
 #      retryable: true     # 默认不开启重试机制
 #  ignoredPatterns: /**/admin/**   # 忽略所有包含/admin/的路径
