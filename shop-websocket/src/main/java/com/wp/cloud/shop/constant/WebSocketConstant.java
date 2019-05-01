@@ -27,7 +27,7 @@ public interface WebSocketConstant {
     String DEST_PREFIX_USER = "/user";
 
     /**
-     * 客户端发送消息前缀-用户信息
+     * 客户端发送消息前缀
      */
     String DEST_PREFIX_APP = "/app";
 }

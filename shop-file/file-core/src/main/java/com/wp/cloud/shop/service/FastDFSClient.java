@@ -1,8 +1,10 @@
 package com.wp.cloud.shop.service;
 
-import com.github.tobato.fastdfs.domain.conn.FdfsWebServer;
+import com.facemeng.cloud.school.common.utils.Base64Util;
 import com.github.tobato.fastdfs.domain.fdfs.StorePath;
 import com.github.tobato.fastdfs.domain.proto.storage.DownloadByteArray;
+import com.github.tobato.fastdfs.domain.upload.FastImageFile;
+import com.github.tobato.fastdfs.exception.FdfsServerException;
 import com.github.tobato.fastdfs.exception.FdfsUnsupportStorePathException;
 import com.github.tobato.fastdfs.service.FastFileStorageClient;
 import lombok.extern.slf4j.Slf4j;
@@ -12,11 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.charset.Charset;
+import java.io.*;
 
 /**
  * @Title: shop-cloud--com.wp.cloud.shop.service.FastDFSClient
@@ -40,6 +38,7 @@ public class FastDFSClient {
      */
     public String uploadFile(MultipartFile file) throws IOException {
         StorePath storePath = storageClient.uploadFile(file.getInputStream(), file.getSize(), FilenameUtils.getExtension(file.getOriginalFilename()), null);
+        log.info("FastDFS 存储文件地址 = {} ", storePath.getFullPath());
         return getResAccessUrl(storePath);
     }
 
@@ -53,20 +52,37 @@ public class FastDFSClient {
     public String uploadFile(File file) throws IOException {
         FileInputStream inputStream = new FileInputStream(file);
         StorePath storePath = storageClient.uploadFile(inputStream, file.length(), FilenameUtils.getExtension(file.getName()), null);
+        log.info("FastDFS 存储文件地址 = {} ", storePath.getFullPath());
         return getResAccessUrl(storePath);
     }
 
     /**
-     * 将一段字符串生成一个文件上传
+     * 上传文件
      *
-     * @param content       文件内容
-     * @param fileExtension
+     * @param fastImageFile
+     * @return 文件访问地址
+     */
+    public String uploadFile(FastImageFile fastImageFile) {
+        StorePath storePath = storageClient.uploadImage(fastImageFile);
+        log.info("FastDFS 存储文件地址 = {} ", storePath.getFullPath());
+        return getResAccessUrl(storePath);
+    }
+
+
+    /**
+     * 将Base64文件存储
+     *
+     * @param base64
+     * @param fileName
      * @return
      */
-    public String uploadFile(String content, String fileExtension) {
-        byte[] buff = content.getBytes(Charset.forName("UTF-8"));
-        ByteArrayInputStream stream = new ByteArrayInputStream(buff);
-        StorePath storePath = storageClient.uploadFile(stream, buff.length, fileExtension, null);
+    public String uploadFile(String base64, String fileName) {
+        byte[] byteArray = Base64Util.decodeBase64(base64);
+        long contentLength = (long) byteArray.length;
+        InputStream inputStream = new ByteArrayInputStream(byteArray);
+        log.info("需要存储的文件的信息 -> {}, {}", fileName, contentLength);
+        StorePath storePath = storageClient.uploadFile(inputStream, contentLength, FilenameUtils.getExtension(fileName), null);
+        log.info("FastDFS 存储文件地址 -> {} ", storePath.getFullPath());
         return getResAccessUrl(storePath);
     }
 
@@ -102,9 +118,18 @@ public class FastDFSClient {
         }
         try {
             StorePath storePath = StorePath.parseFromUrl(fileUrl);
+//            FileInfo fileInfo = storageClient.queryFileInfo(storePath.getGroup(), storePath.getPath());
+//            if (fileInfo != null) {
+//                log.info("删除FastDFS文件 = {}", storePath.getFullPath());
+//                storageClient.deleteFile(storePath.getGroup(), storePath.getPath());
+//            }
+
+            log.info("删除FastDFS文件 = {}", storePath.getFullPath());
             storageClient.deleteFile(storePath.getGroup(), storePath.getPath());
         } catch (FdfsUnsupportStorePathException e) {
-            log.warn(e.getMessage());
+            log.error(e.getMessage());
+        } catch (FdfsServerException e) {
+            log.error(e.getMessage());
         }
     }
 

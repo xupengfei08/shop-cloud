@@ -36,6 +36,12 @@ spring:
           args:
             name: fallbackcmd
             fallbackUri: forward:/fallback
+      - id: shop-file-service
+        uri: lb://shop-file-service
+        predicates:
+        - Path=/shop-file/**
+        filters:
+        - StripPrefix=1
       - id: shop-websocket-http
         # 重点！/info必须使用http进行转发，lb代表从注册中心获取服务
         uri: lb://shop-websocket

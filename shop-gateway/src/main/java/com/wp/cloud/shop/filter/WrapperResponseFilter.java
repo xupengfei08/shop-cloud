@@ -68,12 +68,17 @@ public class WrapperResponseFilter implements GlobalFilter, Ordered {
                         // 释放掉内存
                         DataBufferUtils.release(dataBuffer);
                         String rs = new String(content, Charset.forName("UTF-8"));
-                        JSONObject jsonObject = JSON.parseObject(rs);
+                        JSONObject jsonObject = new JSONObject();
+                        try {
+                            jsonObject = JSON.parseObject(rs);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                         // 判断是否是异常
                         if (null != jsonObject.get("status") && null != jsonObject.get("error") && null != jsonObject.get("message")) {
                             throw new ResponseStatusException(HttpStatus.valueOf(jsonObject.getInteger("status")), jsonObject.getString("message"));
                         }
-                        Result result = Result.builder().data(JSON.parseObject(rs)).ok().build();
+                        Result result = Result.builder().data(jsonObject).ok().build();
                         byte[] newRs = JSON.toJSONString(result).getBytes(Charset.forName("UTF-8"));
                         originalResponse.getHeaders().setContentLength(newRs.length);//如果不重新设置长度则收不到消息。
                         return bufferFactory.wrap(newRs);

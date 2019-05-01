@@ -38,6 +38,17 @@ public class ImageFeignFallBack implements FallbackFactory<ImageFeign> {
                 log.error("请求熔断降级：", throwable);
                 return null;
             }
+
+            @Override
+            public ImagePathDto saveImageToMongo(MultipartFile image) {
+                log.error("请求熔断降级：", throwable);
+                return null;
+            }
+
+            @Override
+            public void deleteImage(ImagePathDto imagePath) {
+                log.error("请求熔断降级：", throwable);
+            }
         };
     }
 }

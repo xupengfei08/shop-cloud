@@ -19,6 +19,11 @@
             <version>1.0.0</version>
         </dependency>
         <dependency>
+            <groupId>com.facemeng.cloud.school</groupId>
+            <artifactId>school-common</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
@@ -41,6 +46,10 @@
             <groupId>com.github.tobato</groupId>
             <artifactId>fastdfs-client</artifactId>
             <version>1.26.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
         </dependency>
     </dependencies>
 

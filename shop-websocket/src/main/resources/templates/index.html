@@ -7,10 +7,7 @@
     <script src="https://cdn.bootcss.com/sockjs-client/1.1.4/sockjs.min.js"></script>
     <script src="https://cdn.bootcss.com/stomp.js/2.3.3/stomp.min.js"></script>
     <script type="text/javascript">
-        /*<![CDATA[*/
 
-        //gateway网关的地址
-        // var host="http://127.0.0.1:8011";
         var stompClient = null;
         var subscription = null;
         var app = angular.module('app', []);
@@ -32,11 +29,10 @@
 
             //连接
             $scope.connect = function () {
-
-                var socket = new SockJS('/shop-ws/chat');
+                var socket = new SockJS('/shop-ws/endpointChat');
                 stompClient = Stomp.over(socket);
                 var token = 'facemeng'; // 通过登录授权的token，连接socket需要验证
-                stompClient.connect({'token': "/user/alertNotice"}, function (frame) {
+                stompClient.connect({'token1': token}, function (frame) {
                     // 注册发送消息
                     stompClient.subscribe('/topic/send', function (msg) {
                         $scope.data.rows.push(JSON.parse(msg.body));
@@ -70,16 +66,11 @@
                         $scope.data.rows.push(JSON.parse(msg.body).message);
                         $scope.$apply();
                     });
-
-                    // 订阅指定用户/user/{userId}/alertNotice
-                    stompClient.subscribe('/user/690/alertNotice', function (msg) {
-                        $scope.data.time = '这里试试试试试试：' + JSON.parse(msg.body).name;
-                        $scope.data.connected = true;
-                        $scope.data.rows.push(JSON.parse(msg.body).message);
-                        $scope.$apply();
-                    });
                     $scope.data.connected = true;
                     $scope.$apply();
+                }, function (error) {
+                    // 连接失败时（服务器响应 ERROR 帧）的回调方法
+                    console.log('连接失败【' + error + '】');
                 });
             };
 
@@ -116,8 +107,9 @@
 <br/>
 <br/>
 <div ng-show="data.connected">
-    <label>{{data.time}}</label> <br/> <br/> <input type="text"
-                                                    ng-model="data.message" placeholder="请输入内容..."/>
+    <label>{{data.time}}</label> <br/>
+    <br/>
+    <input type="text" ng-model="data.message" placeholder="请输入内容..."/>
     <button ng-click="send()" type="button">发送</button>
     <br/> <br/> 消息列表： <br/>
     <table>
@@ -126,8 +118,6 @@
             <th>序号</th>
             <th>ID</th>
             <th>抓怕时间</th>
-            <th>抓拍人员</th>
-            <th>库人员</th>
         </tr>
         </thead>
         <tbody>
@@ -135,8 +125,6 @@
             <td>{{ $index + 1 }}</td>
             <td>{{row.recordId}}</td>
             <td>{{ row.occurTime | date:'yyyy-MM-dd HH:mm:ss' }}</td>
-            <td><img src="{{'http://192.168.100.151:9102'+ row.trackFace}}"/></td>
-            <td><img ng-style="{'width':'200px','height':'200px'}" src="{{'http://192.168.100.151:9102'+row.platformPersonnelInfoModel.face}}"/></td>
         </tr>
         </tbody>
     </table>

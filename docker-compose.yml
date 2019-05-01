@@ -1,19 +1,23 @@
 version: '2'
 
 services:
-#  mysql:
-#   image: mysql:5.7
-#   container_name: szsx-mysql
-#   restart: always
-#   ports:
-#     - "3306:3306"
-#   volumes:
-#     - ./shop-data/mysql/data:/var/lib/mysql
-#   environment:
-#     - "MYSQL_ROOT_PASSWORD=facemeng123"
-#     - "MYSQL_DATABASE=school"
-#   command:
-#      ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
+  shop-mysql:
+    image: mysql:5.7
+    container_name: shop-mysql
+    restart: always
+    ports:
+      - "13306:3306"
+    volumes:
+      - ./shop-data/mysql/data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=facemeng123
+      - MYSQL_DATABASE=shop
+    command:
+      ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
+    networks:
+      shop:
+        ipv4_address: 172.32.16.120
+
   shop-redis:
     image: redis:5
     container_name: shop-redis
@@ -24,42 +28,32 @@ services:
       - ./shop-data/redis/data:/data
     command:
       ["redis-server", "--requirepass", "facemeng123", "--appendonly", "yes"]
+    networks:
+      shop:
+        ipv4_address: 172.32.16.130
 
+  shop-rabbitmq:
+    image: suanmilk/rabbitmq-delay:3.7
+    hostname: shop-rabbitmq
+    container_name: shop-rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - "RABBITMQ_DEFAULT_USER=admin"
+      - "RABBITMQ_DEFAULT_PASS=facemeng123"
+      - "RABBITMQ_DEFAULT_VHOST=shop"
+    volumes:
+      - ./shop-data/rabbitmq/data:/var/lib/rabbitmq
+    networks:
+      shop:
+        ipv4_address: 172.32.16.140
 
-#  shop-eureka:
-#    image: 180.117.163.162:15580/shop-cloud/shop-eureka
-#    hostname: shop-eureka
-#    container_name: shop-eureka
-#    ports:
-#      - "8000:9000"
-#    command: --spring.profiles.active=dev
-#  shop-zuul:
-#    image: 180.117.163.162:15580/shop-cloud/shop-zuul
-#    hostname: shop-zuul
-#    container_name: shop-zuul
-#    ports:
-#      - "8010:9010"
-#    command: --spring.profiles.active=dev
-#    depends_on:
-#      - shop-eureka
-#      - shop-user-service
-#      - shop-order-service
-#  shop-user-service:
-#    image: 180.117.163.162:15580/shop-cloud/user-core
-#    hostname: shop-user-service
-#    container_name: shop-user-service
-##    ports:
-##      - "9020:9020"
-#    command: --spring.profiles.active=dev
-#    depends_on:
-#      - shop-eureka
-#  shop-order-service:
-#    image: 180.117.163.162:15580/shop-cloud/order-core
-#    hostname: shop-order-service
-#    container_name: shop-order-service
-##    ports:
-##      - "9030:9030"
-#    command: --spring.profiles.active=dev
-#    depends_on:
-#      - shop-eureka
-
+networks:
+  shop:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 172.32.16.0/24
+        gateway: 172.32.16.1

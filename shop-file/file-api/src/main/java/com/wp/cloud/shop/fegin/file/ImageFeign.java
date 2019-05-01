@@ -4,6 +4,7 @@ import com.wp.cloud.shop.dto.file.ImageDto;
 import com.wp.cloud.shop.dto.file.ImagePathDto;
 import com.wp.cloud.shop.fallback.file.ImageFeignFallBack;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,11 +21,11 @@ public interface ImageFeign {
     /**
      * 根据图片路径获取图片信息
      *
-     * @param path
+     * @param imagePath
      * @return
      */
     @GetMapping
-    ImageDto getImage(@ModelAttribute ImagePathDto path);
+    ImageDto getImage(@ModelAttribute ImagePathDto imagePath);
 
     /**
      * 上传图片
@@ -44,4 +45,24 @@ public interface ImageFeign {
      */
     @PostMapping("/upload")
     ImagePathDto saveImage(@RequestParam("file") MultipartFile image);
+
+
+    /**
+     * 上传图片到mongodb
+     *
+     * @param image
+     * @return
+     */
+    @PostMapping("/mongo")
+    ImagePathDto saveImageToMongo(@RequestParam("file") MultipartFile image);
+
+
+    /**
+     * 删除图片
+     *
+     * @param imagePath
+     * @return
+     */
+    @PostMapping("/delete")
+    void deleteImage(@RequestBody ImagePathDto imagePath);
 }

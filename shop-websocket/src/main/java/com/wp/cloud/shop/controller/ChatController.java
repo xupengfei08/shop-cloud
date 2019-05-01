@@ -1,9 +1,11 @@
 package com.wp.cloud.shop.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.wp.cloud.shop.service.IRedisSessionService;
 import com.wp.cloud.shop.vo.WSClientMessage;
 import com.wp.cloud.shop.vo.WSServerMessage;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.*;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -26,6 +28,13 @@ import java.util.Map;
 @EnableScheduling
 @RequestMapping("/chat")
 public class ChatController {
+
+    @Autowired
+    private AmqpTemplate amqpTemplate;
+
+    @Autowired
+    private IRedisSessionService redisSessionService;
+
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 

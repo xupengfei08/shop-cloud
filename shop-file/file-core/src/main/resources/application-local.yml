@@ -9,6 +9,9 @@ spring:
       probability: 1.0 #将采样比例1.0是全部都采集，默认是0.1
   kafka:
     bootstrap-servers: 192.168.0.151:9092,192.168.0.152:9092,192.168.0.153:9092 #集群的情况直接用“,”分割
+  data:
+    mongodb:
+      uri: mongodb://root:123456@127.0.0.1:27017/stars_task
 eureka:
   client:
     service-url:
@@ -21,12 +24,16 @@ eureka:
 # 分布式文件系统FDFS配置
 # ===================================================================
 fdfs:
-  so-timeout: 3000          # 3秒超时
-  connect-timeout: 3000     # 3秒超时
+  so-timeout: 2000          # 3秒超时
+  connect-timeout: 1000     # 1秒超时
   thumb-image:              # 缩略图生成参数
     width: 150
     height: 150
+  pool:
+    max-total: 100
+    max-wait-millis: 1000
   tracker-list:             # TrackerList参数,支持多个
+#    - 192.168.50.100:22122
     - 192.168.0.121:22122
-  webServerUrl:
-    192.168.0.121/
+#  webServerUrl: http://192.168.50.100/
+  webServerUrl: http://192.168.0.121/
