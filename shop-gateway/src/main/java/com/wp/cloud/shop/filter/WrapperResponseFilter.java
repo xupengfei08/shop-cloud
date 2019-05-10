@@ -17,6 +17,7 @@ import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.http.server.reactive.ServerHttpResponseDecorator;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
+import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
@@ -68,17 +69,24 @@ public class WrapperResponseFilter implements GlobalFilter, Ordered {
                         // 释放掉内存
                         DataBufferUtils.release(dataBuffer);
                         String rs = new String(content, Charset.forName("UTF-8"));
-                        JSONObject jsonObject = new JSONObject();
-                        try {
-                            jsonObject = JSON.parseObject(rs);
-                        } catch (Exception e) {
-                            e.printStackTrace();
+
+                        Object object = new Object();
+
+                        if (!StringUtils.isEmpty(rs)) {
+                            try {
+                                JSONObject jsonObject = JSON.parseObject(rs);
+                                // 判断是否是异常
+                                if (null != jsonObject.get("status") && null != jsonObject.get("error") && null != jsonObject.get("message")) {
+                                    throw new ResponseStatusException(HttpStatus.valueOf(jsonObject.getInteger("status")), jsonObject.getString("message"));
+                                }
+                                object = jsonObject;
+                            } catch (Exception e) {
+                                // json数组
+                                object = JSON.parseArray(rs);
+                            }
+
                         }
-                        // 判断是否是异常
-                        if (null != jsonObject.get("status") && null != jsonObject.get("error") && null != jsonObject.get("message")) {
-                            throw new ResponseStatusException(HttpStatus.valueOf(jsonObject.getInteger("status")), jsonObject.getString("message"));
-                        }
-                        Result result = Result.builder().data(jsonObject).ok().build();
+                        Result result = Result.builder().data(object).ok().build();
                         byte[] newRs = JSON.toJSONString(result).getBytes(Charset.forName("UTF-8"));
                         originalResponse.getHeaders().setContentLength(newRs.length);//如果不重新设置长度则收不到消息。
                         return bufferFactory.wrap(newRs);

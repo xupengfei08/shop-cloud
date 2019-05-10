@@ -16,6 +16,7 @@
         <module>shop-file</module>
         <module>shop-gateway</module>
         <module>shop-websocket</module>
+        <module>shop-websocket-client</module>
     </modules>
     <packaging>pom</packaging>
 

@@ -1,148 +1,77 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8"/>
-    <title>spring boot——websocket</title>
-    <script src="https://cdn.bootcss.com/angular.js/1.5.6/angular.min.js"></script>
-    <script src="https://cdn.bootcss.com/sockjs-client/1.1.4/sockjs.min.js"></script>
-    <script src="https://cdn.bootcss.com/stomp.js/2.3.3/stomp.min.js"></script>
-    <script type="text/javascript">
-
-        var stompClient = null;
-        var subscription = null;
-        var app = angular.module('app', []);
-        app.controller('MainController', function ($rootScope, $scope, $http, $location) {
-
-            // $scope.$watch('$viewContentLoaded', function() {
-            //     console.log($location.absUrl());
-            //     console.log($location.url());
-            //     console.log($location.search());
-            // })
-
-            $scope.data = {
-                //连接状态
-                connected: false,
-                //消息
-                message: '',
-                rows: []
-            };
-
-            //连接
-            $scope.connect = function () {
-                var socket = new SockJS('/shop-ws/endpointChat');
-                stompClient = Stomp.over(socket);
-                var token = 'facemeng'; // 通过登录授权的token，连接socket需要验证
-                stompClient.connect({'token1': token}, function (frame) {
-                    // 注册发送消息
-                    stompClient.subscribe('/topic/send', function (msg) {
-                        $scope.data.rows.push(JSON.parse(msg.body));
-                        $scope.data.connected = true;
-                        $scope.$apply();
-                    });
-                    // 注册推送时间回调
-                    stompClient.subscribe('/topic/system_time', function (r) {
-                        $scope.data.time = '当前服务器时间：' + r.body;
-                        $scope.data.connected = true;
-                        $scope.$apply();
-                    });
-                    // 注册推送时间回调
-                    stompClient.subscribe('/topic/broadcast', function (r) {
-                        $scope.data.time = '当前广播服务器时间：' + r.body;
-                        $scope.data.connected = true;
-                        $scope.$apply();
-                    });
-                    // 订阅特定用户的信息/queue/{userId}/message
-                    var mysubid = '2010415108';
-                    subscription = stompClient.subscribe('/customer/1/message', function (msg) {
-                        $scope.data.rows.push(JSON.parse(msg.body));
-                        $scope.data.connected = true;
-                        $scope.$apply();
-                    }, {id: mysubid});
-
-                    // 订阅指定用户/user/{userId}/alertNotice
-                    stompClient.subscribe('/customer/151/meetingSignIn', function (msg) {
-                        $scope.data.time = '这里试试试试试试：' + JSON.parse(msg.body).name;
-                        $scope.data.connected = true;
-                        $scope.data.rows.push(JSON.parse(msg.body).message);
-                        $scope.$apply();
-                    });
-                    $scope.data.connected = true;
-                    $scope.$apply();
-                }, function (error) {
-                    // 连接失败时（服务器响应 ERROR 帧）的回调方法
-                    console.log('连接失败【' + error + '】');
-                });
-            };
-
-            $scope.disconnect = function () {
-                if (stompClient != null) {
-                    stompClient.disconnect();
-                }
-                $scope.data.connected = false;
-            }
-
-            $scope.send = function () {
-                stompClient.send("/app/send/123321", {}, JSON.stringify({
-                    'message': $scope.data.message
-                }));
-                // 取消订阅特定用户的信息/queue/{userId}/message
-                subscription.unsubscribe();
-            }
-
-
-        });
-        /*]]>*/
-
-    </script>
+    <meta charset="UTF-8">
+    <title>Java后端WebSocket的Tomcat实现</title>
 </head>
-<body ng-app="app" ng-controller="MainController">
-
-<h2>spring boot——websocket</h2>
-
-<label>WebSocket连接状态:</label>
-<button type="button" ng-disabled="data.connected" ng-click="connect()">连接</button>
-<button type="button" ng-click="disconnect()"
-        ng-disabled="!data.connected">断开
-</button>
-<br/>
-<br/>
-<div ng-show="data.connected">
-    <label>{{data.time}}</label> <br/>
-    <br/>
-    <input type="text" ng-model="data.message" placeholder="请输入内容..."/>
-    <button ng-click="send()" type="button">发送</button>
-    <br/> <br/> 消息列表： <br/>
-    <table>
-        <thead>
-        <tr>
-            <th>序号</th>
-            <th>ID</th>
-            <th>抓怕时间</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr ng-repeat="row in data.rows | orderBy : '-occurTime'">
-            <td>{{ $index + 1 }}</td>
-            <td>{{row.recordId}}</td>
-            <td>{{ row.occurTime | date:'yyyy-MM-dd HH:mm:ss' }}</td>
-        </tr>
-        </tbody>
-    </table>
-</div>
+<body>
+Welcome<br/><input id="text" type="text"/>
+<button onclick="send()">发送消息</button>
+<hr/>
+<button onclick="closeWebSocket()">关闭WebSocket连接</button>
+<hr/>
+<div id="message"></div>
 </body>
-<style>
-    table, th, td {
-        border: 1px solid grey;
-        border-collapse: collapse;
-        padding: 5px;
+
+<script type="text/javascript">
+    var websocket = null;
+
+    function connectWebSocket() {
+        console.log("12331231231")
     }
 
-    table tr:nth-child(odd) {
-        background-color: #f1f1f1;
+    //判断当前浏览器是否支持WebSocket
+    if ('WebSocket' in window) {
+        //创建WebSocket连接
+        websocket = new WebSocket("ws://localhost:8011/shop-ws/webSocketServer?userId=wrwefesdfwetrwe324324", "hello-ws");
+    }
+    else {
+        alert('当前浏览器不支持websocket')
     }
 
-    table tr:nth-child(even) {
-        background-color: #ffffff;
+    //连接发生错误的回调方法
+    websocket.onerror = function () {
+        setMessageInnerHTML("WebSocket连接发生错误");
     }
-</style>
+
+    //连接成功建立的回调方法
+    websocket.onopen = function () {
+        setMessageInnerHTML("WebSocket连接成功");
+        window.clearTimeout(connectInterval);//去掉定时器
+    }
+
+    //接收到消息的回调方法
+    websocket.onmessage = function (event) {
+        setMessageInnerHTML(event.data);
+    }
+
+    //连接关闭的回调方法
+    websocket.onclose = function () {
+        setMessageInnerHTML("WebSocket连接关闭");
+        setMessageInnerHTML("WebSocket定时重连");
+    }
+
+    //监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
+    window.onbeforeunload = function () {
+        closeWebSocket();
+    }
+
+    //将消息显示在网页上
+    function setMessageInnerHTML(innerHTML) {
+        document.getElementById('message').innerHTML += innerHTML + '<br/>';
+    }
+
+    //关闭WebSocket连接
+    function closeWebSocket() {
+        websocket.close();
+    }
+
+    //发送消息
+    function send() {
+        var message = document.getElementById('text').value;
+        websocket.send(message);
+    }
+
+    var connectInterval = window.setInterval(connectWebSocket, 10000);
+</script>
 </html>

@@ -32,6 +32,21 @@ public class FastDFSClient {
     /**
      * 上传文件
      *
+     * @param inputStream
+     * @param length
+     * @param fileName
+     * @return
+     * @throws IOException
+     */
+    public String uploadFile(InputStream inputStream, long length, String fileName) {
+        StorePath storePath = storageClient.uploadFile(inputStream, length, fileName, null);
+        log.info("FastDFS 存储文件地址 = {} ", storePath.getFullPath());
+        return getResAccessUrl(storePath);
+    }
+
+    /**
+     * 上传文件
+     *
      * @param file 文件对象
      * @return 文件访问地址
      * @throws IOException

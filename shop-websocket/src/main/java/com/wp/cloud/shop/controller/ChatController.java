@@ -1,21 +1,15 @@
 package com.wp.cloud.shop.controller;
 
-import com.alibaba.fastjson.JSONObject;
-import com.wp.cloud.shop.service.IRedisSessionService;
-import com.wp.cloud.shop.vo.WSClientMessage;
-import com.wp.cloud.shop.vo.WSServerMessage;
+import com.wp.cloud.shop.common.utils.MD5Util;
+import com.wp.cloud.shop.config.ServerConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.handler.annotation.*;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import java.util.Map;
 
 /**
  * @Title: shop-cloud--com.wp.cloud.shop.controller.ChatController
@@ -25,79 +19,32 @@ import java.util.Map;
  */
 @Slf4j
 @Controller
-@EnableScheduling
 @RequestMapping("/chat")
 public class ChatController {
 
     @Autowired
     private AmqpTemplate amqpTemplate;
+//
+//    @Autowired
+//    private SimpMessagingTemplate messagingTemplate;
 
     @Autowired
-    private IRedisSessionService redisSessionService;
+    private StringRedisTemplate stringRedisTemplate;
 
     @Autowired
-    private SimpMessagingTemplate messagingTemplate;
+    private ServerConfig serverConfig;
 
     @GetMapping("/index")
     public String index() {
         return "index";
     }
 
-    /**
-     * 测试web发送消息到服务器
-     *
-     * @param id
-     * @param headers
-     * @param message
-     * @return
-     */
-    @MessageMapping("/send/{id}")
-    @SendTo("/topic/send")
-    public WSServerMessage send(@DestinationVariable("id") String id,
-                                @Headers Map headers,
-                                @Payload WSClientMessage message) {
-        log.info("id : {}", id);
-        log.info("headers : ", JSONObject.toJSONString(headers));
-        return new WSServerMessage("测试成功");
-    }
-
-    /**
-     * 当浏览器向服务端发送请求时,通过@MessageMapping映射/welcome这个地址,类似于@ResponseMapping
-     * 当服务器有消息时,会对订阅了@SendTo中的路径的浏览器发送消息
-     *
-     * @param clientMessage
-     * @return
-     */
-    @MessageMapping("/welcome")
-    @SendTo("/topic/broadcast")
-    public WSServerMessage welcome(WSClientMessage clientMessage) {
-        //方法用于广播测试
-        System.out.println("clientMessage.getName() = " + clientMessage.getMessage().toString());
-        return new WSServerMessage("Welcome , " + clientMessage.getMessage().toString() + " !");
-    }
-
-    /**
-     * 每一分钟校验服务器时间
-     *
-     * @return
-     */
-    @Scheduled(fixedRate = 60000)
-    public Object callback() {
-        messagingTemplate.convertAndSend("/topic/system_time", System.currentTimeMillis());
-        return null;
-    }
-
-    /**
-     * 发送报警推送网页消息给指定用户
-     */
-    @MessageMapping("/alertNotice")
-    public WSServerMessage alertNotice() {
-
-        messagingTemplate.convertAndSendToUser("145", "user/" + 146 + "/alertNotice",
-                new WSServerMessage("警报信息 , aaaa " + " !"));
-        //方法用于发送报警推送网页消息给指定用户
-        System.out.println("网页警报信息 = aaaa");
-        return null;
+    //向redis消息队列index通道发布消息
+    @Scheduled(fixedRate = 300000)
+    public void sendMessage() {
+        String serverHostMD5 = MD5Util.encodeByMD5(serverConfig.getHost());
+        String channel = "topic.ws." + serverHostMD5;
+        stringRedisTemplate.convertAndSend(channel, serverConfig.getHost());
     }
 
 }

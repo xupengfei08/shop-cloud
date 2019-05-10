@@ -1,12 +1,16 @@
 package com.wp.cloud.shop.controller.file;
 
+import com.alibaba.fastjson.JSON;
 import com.facemeng.cloud.school.common.utils.Base64Util;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import com.wp.cloud.shop.biz.FdfsUploadbiz;
 import com.wp.cloud.shop.dto.file.ImageDto;
 import com.wp.cloud.shop.dto.file.ImagePathDto;
 import com.wp.cloud.shop.fegin.file.ImageFeign;
+import com.wp.cloud.shop.model.UploadInfo;
 import com.wp.cloud.shop.service.FastDFSClient;
+import com.wp.cloud.shop.utils.MD5Util;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -15,16 +19,13 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.*;
 
 /**
  * @Title: shop-cloud--FileController
@@ -42,6 +43,9 @@ public class FileController implements ImageFeign {
 
     @Autowired
     private GridFsTemplate gridFsTemplate;
+
+    @Autowired
+    private FdfsUploadbiz fdfsUploadbiz;
 
     @Override
     @ApiOperation(value = "根据图片路径获取图片信息", notes = "根据图片路径获取图片信息")
@@ -64,9 +68,10 @@ public class FileController implements ImageFeign {
     @Override
     @ApiOperation(value = "上传图片", notes = "上传图片")
     public ImagePathDto saveImage(@RequestParam @ApiParam(value = "图片文件", required = true) MultipartFile file) {
+        String fileName = String.valueOf(Calendar.getInstance().getTimeInMillis());
+
         try {
-            String path = fdfsClient.uploadFile(file);
-            return new ImagePathDto(path);
+            fdfsUploadbiz.uploadFile(file.getInputStream(), file.getSize(), fileName+ ".jpg");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -95,5 +100,62 @@ public class FileController implements ImageFeign {
     @ApiOperation(value = "删除图片", notes = "删除图片")
     public void deleteImage(@RequestBody ImagePathDto imagePath) {
         fdfsClient.deleteFile(imagePath.getPath());
+    }
+
+    @PostMapping("/run")
+    @ApiOperation(value = "上传文件任务", notes = "上传文件任务")
+    public List<UploadInfo> runTask(@RequestParam("path") @ApiParam(value = "文件目录", required = true) String path,
+                                    @RequestParam("limit") @ApiParam(value = "上传文件数", example = "50") Integer limit,
+                                    @RequestParam("sleep") @ApiParam(value = "等待结果秒数", example = "10") Integer sleep) {
+        File filePath = new File(path);
+        if (filePath.exists() && filePath.isDirectory()) {
+            File[] files = filePath.listFiles();
+            if (files != null && files.length > 0) {
+                int index = 0;
+                List<UploadInfo> uploadInfoList = new ArrayList<>();
+                for (File file : files) {
+                    if (limit != null && index == limit)
+                        break;
+                    // 计算旧的文件MD5值
+                    UploadInfo uploadInfo = new UploadInfo();
+                    uploadInfo.setFileName(file.getName());
+                    uploadInfo.setOldMd5(MD5Util.fileMD5(file));
+                    fdfsUploadbiz.uploadFile(file, uploadInfo);
+                    uploadInfoList.add(uploadInfo);
+                    index++;
+                }
+                if (sleep == null || sleep <= 0)
+                    sleep = 10;
+                try {
+                    Thread.sleep(sleep * 1000L);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                // 计算上传后的文件MD5
+                uploadInfoList.stream().forEach(uploadInfo -> {
+                    if (uploadInfo.getStorePath() != null) {
+                        byte[] data = fdfsClient.download(uploadInfo.getStorePath());
+                        uploadInfo.setNewMd5(MD5Util.byteMD5(data));
+                        if (uploadInfo.getOldMd5().equals(uploadInfo.getNewMd5())) {
+                            uploadInfo.setError(false);
+                        } else {
+                            uploadInfo.setError(true);
+                        }
+                    }
+                });
+                log.info(JSON.toJSONString(uploadInfoList));
+                Iterator<UploadInfo> iterable = uploadInfoList.iterator();
+                while (iterable.hasNext()) {
+                    UploadInfo info = iterable.next();
+                    if (!info.getError())
+                        iterable.remove();
+                }
+                log.info(JSON.toJSONString(uploadInfoList, true));
+                return uploadInfoList;
+            }
+        } else {
+            log.error("指定路径异常");
+        }
+        return null;
     }
 }
